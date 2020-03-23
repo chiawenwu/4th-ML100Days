@@ -1,0 +1,35 @@
+import os
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+dir_data = './data/'
+# 讀取資料檔
+f_app_train = os.path.join(dir_data, 'application_train.csv')
+app_train = pd.read_csv(f_app_train)
+
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+for col in app_train:
+    if app_train[col].dtype == 'object':
+        if len(list(app_train[col].unique())) <=2:
+            app_train[col] = le.fit_transform(app_train[col])
+print(app_train.shape)
+print(app_train)
+
+app_train['DAYS_EMPLOYED_ANOM'] = app_train["DAYS_EMPLOYED"] == 365243
+app_train['DAYS_EMPLOYED'].replace({365243: np.nan}, inplace = True)
+# 出生日數 (DAYS_BIRTH) 取絕對值
+app_train['DAYS_BIRTH'] = abs(app_train['DAYS_BIRTH'])
+
+print(app_train)
+print('max:',max(app_train['CNT_FAM_MEMBERS']))
+print('min:',min(app_train['CNT_FAM_MEMBERS']))
+#print('median:',np.median(app_train['CNT_FAM_MEMBERS']))
+#print('percentile',np.percentile(app_train['CNT_FAM_MEMBERS'],[25,50,75]))
+bin_cut =20
+bin_cut_rang = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+#app_train['CNT_FAM_MEMBERS'] = pd.cut(app_train['CNT_FAM_MEMBERS'], bins = bin_cut)
+app_train['CNT_FAM_MEMBERS'] = pd.cut(app_train['CNT_FAM_MEMBERS'], bins = bin_cut_rang)
+age_count=app_train['CNT_FAM_MEMBERS'] .value_counts()
+print(age_count)
